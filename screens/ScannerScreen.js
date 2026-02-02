@@ -35,11 +35,17 @@ export default function ScannerScreen({ route, navigation }) {
             if (response.data && response.data.valid) {
                 setResult({ status: 'valid', message: response.data.message, data: response.data.ticket });
             } else {
-                setResult({ status: 'invalid', message: 'Ticket inválido o no encontrado.' });
+                // Show specific server error if available
+                const msg = response.data && response.data.message ? response.data.message : 'Ticket inválido o no encontrado.';
+                setResult({ status: 'invalid', message: msg });
             }
         } catch (error) {
             // Handle 404/403/500
-            setResult({ status: 'error', message: 'Error validando ticket' });
+            const errorMsg = error.response && error.response.data && error.response.data.message
+                ? 'Server: ' + error.response.data.message
+                : 'Error de conexión: ' + error.message;
+
+            setResult({ status: 'error', message: errorMsg });
         } finally {
             setLoading(false);
         }
